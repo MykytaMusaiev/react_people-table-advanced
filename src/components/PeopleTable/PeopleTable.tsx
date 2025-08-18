@@ -2,16 +2,32 @@ import React from 'react';
 import { Person } from '../../types';
 import { PersonLink } from '../PersonLink';
 import cn from 'classnames';
+import { SortableColHead } from '../SortableColHead';
+
+const columns = [
+  { title: 'Name', sortField: 'name' },
+  { title: 'Sex', sortField: 'sex' },
+  { title: 'Born', sortField: 'born' },
+  { title: 'Died', sortField: 'died' },
+];
 
 interface Props {
   peoples: Person[];
   selectedPersonSlug?: string;
+  onSort: (sortField: string) => void;
+  searchParams: URLSearchParams;
 }
 
 export const PeopleTable: React.FC<Props> = ({
   peoples,
   selectedPersonSlug,
+  onSort,
+  searchParams,
 }) => {
+  const handleClick = (sortField: string) => {
+    onSort(sortField);
+  };
+
   return (
     <table
       data-cy="peopleTable"
@@ -19,46 +35,15 @@ export const PeopleTable: React.FC<Props> = ({
     >
       <thead>
         <tr>
-          <th>
-            <span className="is-flex is-flex-wrap-nowrap">
-              Name
-              <a href="#/people?sort=name">
-                <span className="icon">
-                  <i className="fas fa-sort" />
-                </span>
-              </a>
-            </span>
-          </th>
-          <th>
-            <span className="is-flex is-flex-wrap-nowrap">
-              Sex
-              <a href="#/people?sort=sex">
-                <span className="icon">
-                  <i className="fas fa-sort" />
-                </span>
-              </a>
-            </span>
-          </th>
-          <th>
-            <span className="is-flex is-flex-wrap-nowrap">
-              Born
-              <a href="#/people?sort=born&amp;order=desc">
-                <span className="icon">
-                  <i className="fas fa-sort" />
-                </span>
-              </a>
-            </span>
-          </th>
-          <th>
-            <span className="is-flex is-flex-wrap-nowrap">
-              Died
-              <a href="#/people?sort=died">
-                <span className="icon">
-                  <i className="fas fa-sort" />
-                </span>
-              </a>
-            </span>
-          </th>
+          {columns.map(column => (
+            <SortableColHead
+              key={column.sortField}
+              title={column.title}
+              sortField={column.sortField}
+              onSort={handleClick}
+              searchParams={searchParams}
+            />
+          ))}
           <th>Mother</th>
           <th>Father</th>
         </tr>
@@ -69,7 +54,6 @@ export const PeopleTable: React.FC<Props> = ({
           <tr
             key={person.slug}
             data-cy="person"
-            // className="has-background-warning"
             className={cn({
               'has-background-warning': selectedPersonSlug === person.slug,
             })}

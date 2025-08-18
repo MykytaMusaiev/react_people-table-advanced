@@ -1,41 +1,20 @@
-import { useEffect, useState } from 'react';
 import { Loader } from '../Loader';
-import { getPeople } from '../../api';
-import { Person } from '../../types';
 import { PeopleTable } from '../PeopleTable';
 import NoPeopleOnServerError from '../NoPeopleOnServerError';
 import SomethingWrongError from '../SomethingWrongError';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { PeopleFilters } from '../PeopleFilters';
+import { useFiltAndSortPeople } from '../../hooks/useFiltAndSortPeople';
+import { usePeopleData } from '../../hooks/usePeopleData';
+import { useSort } from '../../hooks/useSort';
 
 export const PeoplePage = () => {
-  const [peoples, setPeoples] = useState<Person[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
-
-  useEffect(() => {
-    const loadPeoples = async () => {
-      try {
-        setIsLoading(true);
-        const peoplesList = await getPeople();
-
-        setPeoples(peoplesList);
-        setHasError(false);
-      } catch (err) {
-        setHasError(true);
-
-        setPeoples([]);
-      } finally {
-        setIsLoading(false);
-        setIsFirstLoad(false);
-      }
-    };
-
-    loadPeoples();
-  }, []);
-
+  const { peoples, isLoading, hasError, isFirstLoad } = usePeopleData();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { slug } = useParams<{ slug: string }>();
+
+  const visiblePeople = useFiltAndSortPeople(peoples, searchParams);
+  const handleSort = useSort();
 
   return (
     <>
@@ -43,7 +22,10 @@ export const PeoplePage = () => {
       <div className="block">
         <div className="columns is-desktop is-flex-direction-row-reverse">
           <div className="column is-7-tablet is-narrow-desktop">
-            <PeopleFilters />
+            <PeopleFilters
+              searchParams={searchParams}
+              setSearchParams={setSearchParams}
+            />
           </div>
           <div className="box table-container">
             {isLoading && <Loader />}
@@ -53,7 +35,12 @@ export const PeoplePage = () => {
               peoples.length === 0 &&
               !isFirstLoad && <NoPeopleOnServerError />}
             {!isLoading && !hasError && peoples.length > 0 && (
-              <PeopleTable peoples={peoples} selectedPersonSlug={slug} />
+              <PeopleTable
+                peoples={visiblePeople}
+                selectedPersonSlug={slug}
+                onSort={handleSort}
+                searchParams={searchParams}
+              />
             )}
           </div>
         </div>
