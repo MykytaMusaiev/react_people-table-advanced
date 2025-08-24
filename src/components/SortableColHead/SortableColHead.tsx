@@ -23,6 +23,14 @@ export const SortableColHead: React.FC<Props> = ({
   const currentOrder = searchParams?.get('order') || 'asc';
 
   const isCurrentSort = currentSortField === sortField;
+
+  const nextOrder = isCurrentSort && currentOrder === 'asc' ? 'desc' : 'asc';
+
+  const newSearchParams = new URLSearchParams(searchParams.toString());
+
+  newSearchParams.set('sort', sortField);
+  newSearchParams.set('order', nextOrder);
+
   const iconClassName = cn('fas', {
     'fa-sort-up': isCurrentSort && currentOrder === 'asc',
     'fa-sort-down': isCurrentSort && currentOrder === 'desc',
@@ -33,7 +41,10 @@ export const SortableColHead: React.FC<Props> = ({
     <th>
       <span className="is-flex is-flex-wrap-nowrap">
         {title}
-        <a href={`#/people?sort=${sortField}`} onClick={handleClick}>
+        <a
+          href={`#/people?${newSearchParams.toString()}`}
+          onClick={handleClick}
+        >
           <span className="icon">
             <i className={iconClassName} />
           </span>

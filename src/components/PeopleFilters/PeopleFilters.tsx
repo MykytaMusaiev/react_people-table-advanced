@@ -66,7 +66,7 @@ export const PeopleFilters: React.FC<Props> = ({
   };
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newQuery = e.target.value;
+    const newQuery = e.currentTarget.value;
 
     setQuery(newQuery);
 

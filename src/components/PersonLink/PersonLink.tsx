@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Person } from '../../types';
 import cn from 'classnames';
 
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export const PersonLink: React.FC<Props> = ({ personName, allPeople }) => {
+  const { search } = useLocation();
   const personData = allPeople.find(humon => humon.name === personName);
 
   if (!personData || !personName) {
@@ -15,13 +17,11 @@ export const PersonLink: React.FC<Props> = ({ personName, allPeople }) => {
   }
 
   const isFemale = personData.sex === 'f';
+  const personPath = `/people/${personData.slug}${search}`;
 
   return (
-    <a
-      className={cn({ 'has-text-danger': isFemale })}
-      href={`#/people/${personData.slug}`}
-    >
+    <Link className={cn({ 'has-text-danger': isFemale })} to={personPath}>
       {personName}
-    </a>
+    </Link>
   );
 };
