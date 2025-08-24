@@ -24,12 +24,17 @@ export const SortableColHead: React.FC<Props> = ({
 
   const isCurrentSort = currentSortField === sortField;
 
-  const nextOrder = isCurrentSort && currentOrder === 'asc' ? 'desc' : 'asc';
-
   const newSearchParams = new URLSearchParams(searchParams.toString());
 
-  newSearchParams.set('sort', sortField);
-  newSearchParams.set('order', nextOrder);
+  if (!isCurrentSort) {
+    newSearchParams.set('sort', sortField);
+    newSearchParams.set('order', 'asc');
+  } else if (currentOrder === 'asc') {
+    newSearchParams.set('order', 'desc');
+  } else {
+    newSearchParams.delete('sort');
+    newSearchParams.delete('order');
+  }
 
   const iconClassName = cn('fas', {
     'fa-sort-up': isCurrentSort && currentOrder === 'asc',
